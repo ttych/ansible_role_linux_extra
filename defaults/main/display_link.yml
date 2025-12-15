@@ -1,0 +1,16 @@
+---
+
+want_display_link: false
+want_linux_display_link: false
+
+
+display_link_prereqs:
+  - wget
+  - dkms
+  - linux-headers-generic
+  - libdrm-dev
+
+display_link_package: displaylink-driver
+
+display_link_ubuntu_url: https://www.synaptics.com/sites/default/files/Ubuntu/pool/stable/main/all/synaptics-repository-keyring.deb
+

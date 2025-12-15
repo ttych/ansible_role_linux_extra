@@ -1,0 +1,9 @@
+---
+
+- block:
+
+    - include_tasks: context.yml
+
+    - include_tasks: display_link.yml
+
+  when: ansible_system == 'Linux'

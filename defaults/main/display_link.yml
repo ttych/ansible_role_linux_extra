@@ -12,5 +12,6 @@ display_link_prereqs:
 
 display_link_package: displaylink-driver
 
-display_link_ubuntu_url: https://www.synaptics.com/sites/default/files/Ubuntu/pool/stable/main/all/synaptics-repository-keyring.deb
+display_link_ubuntu_package: synaptics-repository-keyring
+display_link_ubuntu_url: "https://www.synaptics.com/sites/default/files/Ubuntu/pool/stable/main/all/{{ display_link_ubuntu_package }}.deb"
 

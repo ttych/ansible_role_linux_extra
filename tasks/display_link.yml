@@ -11,6 +11,7 @@
           apt:
             update_cache: yes
             cache_valid_time: 3600
+          changed_when: no
 
         - name: Install prerequisite packages
           apt:
@@ -21,22 +22,31 @@
               - libdrm-dev
             state: present
 
-# FIXME: if not already installed
+        - name: "check if {{ display_link_ubuntu_package }} is installed"
+          command: "dpkg-query -W -f='${Status}' {{ display_link_ubuntu_package }}"
+          register: t_linux_display_link_status
+          ignore_errors: yes
+          changed_when: no
 
-        - name: Download synaptics repository keyring
-          get_url:
-            url: "{{ display_link_ubuntu_url }}"
-            dest: "{{ tmpdir }}/synaptics-repository-keyring.deb"
-            mode: '0644'
+        - block:
 
-        - name: Install the downloaded .deb package
-          apt:
-            deb: "{{ tmpdir }}/synaptics-repository-keyring.deb"
-            state: present
+            - name: Download synaptics repository keyring
+              get_url:
+                url: "{{ display_link_ubuntu_url }}"
+                dest: "{{ tmpdir }}/{{ display_link_ubuntu_package }}.deb"
+                mode: '0644'
+
+            - name: Install the downloaded .deb package
+              apt:
+                deb: "{{ tmpdir }}/{{ display_link_ubuntu_package }}.deb"
+                state: present
+
+          when: (t_linux_display_link_status.rc != 0) or ('install ok installed' not in t_linux_display_link_status.stdout)
 
         - name: Update apt repositories
           apt:
             update_cache: yes
+          changed_when: no
 
         - name: Install DisplayLink driver
           apt:
@@ -45,15 +55,15 @@
 
         - name: Clean up downloaded .deb file
           file:
-            path: "{{ tmpdir }}/synaptics-repository-keyring.deb"
+            path: "{{ tmpdir }}/{{ display_link_ubuntu_package }}.deb"
             state: absent
 
         # - name: Load DisplayLink module (optional - may require reboot)
         #   shell: displaylink-installer install
         #   changed_when: false
 
-# FIXME: mark for reboot if upgraded / installed / changed
-        
+        # - name: mark reboot requested
+
         - name: Display completion message
           debug:
             msg: |
@@ -64,4 +74,3 @@
 
 
   when: (want_display_link | d(false)) or (want_linux_display_link | d(false))
-
